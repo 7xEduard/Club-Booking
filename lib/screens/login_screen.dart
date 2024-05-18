@@ -93,7 +93,6 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, 'SignupScreen');
                     },
                     child: const Text(
                       "Forgot Password?",
