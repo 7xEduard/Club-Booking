@@ -4,8 +4,16 @@ class PasswordField extends StatefulWidget {
   final String? hintText;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
+  final TextEditingController controller;
+  final TextInputType? keyboardType;
 
-  const PasswordField({super.key, this.hintText, this.onChanged, this.validator});
+  const PasswordField(
+      {super.key,
+      this.hintText,
+      this.onChanged,
+      this.validator,
+      required this.controller,
+      this.keyboardType = TextInputType.text});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -17,9 +25,11 @@ class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: widget.controller,
       validator: widget.validator,
       onChanged: widget.onChanged,
       obscureText: _isHidden,
+      keyboardType: widget.keyboardType,
       decoration: InputDecoration(
         suffixIcon: IconButton(
           icon: Icon(
@@ -36,6 +46,14 @@ class _PasswordFieldState extends State<PasswordField> {
           borderSide: const BorderSide(
             color: Color.fromARGB(255, 216, 214, 214),
             width: 2.0,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            width: 2,
+            style: BorderStyle.solid,
+            color: Colors.red,
           ),
         ),
         focusedBorder: OutlineInputBorder(

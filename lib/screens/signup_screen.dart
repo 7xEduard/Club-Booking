@@ -1,6 +1,7 @@
 import 'package:clubs_booking/components/custom_button.dart';
 import 'package:clubs_booking/components/custom_text_field.dart';
 import 'package:clubs_booking/components/password_widget.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 import 'package:footer/footer_view.dart';
@@ -11,11 +12,14 @@ class SignupScreen extends StatelessWidget {
     super.key,
   });
 
-  String? name;
-  String? email;
-  String? password;
-  String? confirmPassword;
-  String? phone;
+  final GlobalKey<FormState> signUpKey = GlobalKey();
+  final TextEditingController emailAddressController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+
+  final TextEditingController phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -56,122 +60,164 @@ class SignupScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 80),
-                const Text(
-                  'Create account!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 27,
-                    color: Color(0xFF17c3b2),
+            child: Form(
+              key: signUpKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 80),
+                  const Text(
+                    'Create account!',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 27,
+                      color: Color(0xFF17c3b2),
+                    ),
                   ),
-                ),
-                const Text(
-                  'Register to get started',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey,
+                  const Text(
+                    'Register to get started',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  icon: Icons.account_circle_outlined,
-                  onChanged: (data) {
-                    name = data;
-                  },
-                  hintText: "Name",
-                ),
-                const SizedBox(height: 15),
-                CustomTextField(
-                  icon: Icons.email_outlined,
-                  onChanged: (data) {
-                    email = data;
-                  },
-                  hintText: "Email Address",
-                ),
-                const SizedBox(height: 15),
-                CustomTextField(
-                  icon: Icons.phone_outlined,
-                  onChanged: (data) {
-                    phone = data;
-                  },
-                  hintText: "Phone",
-                ),
-                const SizedBox(height: 15),
-                PasswordField(
-                  hintText: 'Password',
-                  onChanged: (data) {
-                    password = data;
-                  },
-                ),
-                const SizedBox(height: 15),
-                PasswordField(
-                  hintText: 'Confirm Password',
-                  onChanged: (data) {
-                    confirmPassword = data;
-                  },
-                ),
-                const SizedBox(height: 30),
-                Column(
-                  children: [
-                    const Text(
-                      'By logging, you are agreeing with our',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.grey,
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                    icon: Icons.account_circle_outlined,
+                    onChanged: (data) {},
+                    keyboardType: TextInputType.name,
+                    controller: nameController,
+                    hintText: "Name",
+                    validator: nameValidate,
+                  ),
+                  const SizedBox(height: 15),
+                  CustomTextField(
+                    keyboardType: TextInputType.emailAddress,
+                    icon: Icons.email_outlined,
+                    onChanged: (data) {},
+                    controller: emailAddressController,
+                    hintText: "Email Address",
+                    validator: emailValidate,
+                  ),
+                  const SizedBox(height: 15),
+                  CustomTextField(
+                    icon: Icons.phone_outlined,
+                    onChanged: (data) {},
+                    keyboardType: TextInputType.phone,
+                    controller: phoneController,
+                    hintText: "Phone",
+                    validator: phoneValidate,
+                  ),
+                  const SizedBox(height: 15),
+                  PasswordField(
+                    hintText: 'Password',
+                    onChanged: (data) {},
+                    validator: passwordValidate,
+                    controller: passwordController,
+                  ),
+                  const SizedBox(height: 15),
+                  PasswordField(
+                    hintText: 'Confirm Password',
+                    validator: passwordValidate,
+                    onChanged: (data) {},
+                    controller: confirmPasswordController,
+                  ),
+                  const SizedBox(height: 30),
+                  Column(
+                    children: [
+                      const Text(
+                        'By logging, you are agreeing with our',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey,
+                        ),
                       ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {},
-                          child: const Text(
-                            "Terms of Use",
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Text(
+                              "Terms of Use",
+                              style: TextStyle(
+                                color: Color(0xFF17c3b2),
+                                decoration: TextDecoration.underline,
+                                decorationColor: Color(0xFF17c3b2),
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          const Text(
+                            " and ",
                             style: TextStyle(
-                              color: Color(0xFF17c3b2),
-                              decoration: TextDecoration.underline,
-                              decorationColor: Color(0xFF17c3b2),
+                              color: Colors.grey,
                               fontSize: 15,
                             ),
                           ),
-                        ),
-                        const Text(
-                          " and ",
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 15,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {},
-                          child: const Text(
-                            "Privacy Policy",
-                            style: TextStyle(
-                              color: Color(0xFF17c3b2),
-                              decoration: TextDecoration.underline,
-                              decorationColor: Color(0xFF17c3b2),
-                              fontSize: 15,
+                          GestureDetector(
+                            onTap: () {},
+                            child: const Text(
+                              "Privacy Policy",
+                              style: TextStyle(
+                                color: Color(0xFF17c3b2),
+                                decoration: TextDecoration.underline,
+                                decorationColor: Color(0xFF17c3b2),
+                                fontSize: 15,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                CustomButton(
-                  onPressed: () {},
-                  labelText: 'Register',
-                ),
-              ],
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  CustomButton(
+                    onPressed: () {
+                      if (signUpKey.currentState!.validate()) {}
+                    },
+                    labelText: 'Register',
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  String? emailValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email must not be empty.';
+    } else if (!EmailValidator.validate(value)) {
+      return 'Email syntax is not valid.';
+    }
+    return null;
+  }
+
+  String? passwordValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password must not be empty.';
+    } else if (value.length < 6) {
+      return 'Password must be at least 6 digits.';
+    }
+    return null;
+  }
+
+  String? nameValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name must not be empty.';
+    }
+    return null;
+  }
+
+  String? phoneValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone must not be empty.';
+    } else if (value.length < 11 || value.length > 11) {
+      return 'Phone must be at least 11 digits.';
+    }
+    return null;
   }
 }
 /**/

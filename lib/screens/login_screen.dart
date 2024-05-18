@@ -1,16 +1,18 @@
 import 'package:clubs_booking/components/custom_button.dart';
 import 'package:clubs_booking/components/custom_text_field.dart';
 import 'package:clubs_booking/components/password_widget.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
 import 'package:footer/footer_view.dart';
 
 // ignore: must_be_immutable
 class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key, this.email, this.password});
+  final GlobalKey<FormState> logInKey = GlobalKey();
+  final TextEditingController emailAddressController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  String? email;
-  String? password;
+  LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -51,58 +53,64 @@ class LoginScreen extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 80),
-                const Text(
-                  'Welcome back!',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 27,
-                    color: Color(0xFF17c3b2),
-                  ),
-                ),
-                const Text(
-                  'Enter your credentiails to continue',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                CustomTextField(
-                  icon: Icons.email_outlined,
-                  onChanged: (data) {
-                    email = data;
-                  },
-                  hintText: "Email Address",
-                ),
-                const SizedBox(height: 15),
-                PasswordField(
-                  hintText: 'Password',
-                  onChanged: (data) {
-                    password = data;
-                  },
-                ),
-                const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, 'SignupScreen');
-                  },
-                  child: const Text(
-                    "Forgot Password?",
+            child: Form(
+              key: logInKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 80),
+                  const Text(
+                    'Welcome back!',
                     style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 27,
                       color: Color(0xFF17c3b2),
                     ),
                   ),
-                ),
-                const SizedBox(height: 30),
-                CustomButton(
-                  onPressed: () {},
-                  labelText: 'Login',
-                ),
-              ],
+                  const Text(
+                    'Enter your credentiails to continue',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  CustomTextField(
+                    controller: emailAddressController,
+                    icon: Icons.email_outlined,
+                    onChanged: (data) {},
+                    hintText: "Email Address",
+                    validator: emailValidate,
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  const SizedBox(height: 15),
+                  PasswordField(
+                    controller: passwordController,
+                    hintText: 'Password',
+                    onChanged: (data) {},
+                    validator: passwordValidate,
+                  ),
+                  const SizedBox(height: 20),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, 'SignupScreen');
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        color: Color(0xFF17c3b2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  CustomButton(
+                    onPressed: () {
+                      if (logInKey.currentState!.validate()) {}
+                    },
+                    labelText: 'Login',
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 50),
@@ -156,5 +164,23 @@ class LoginScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String? emailValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email must not be empty.';
+    } else if (!EmailValidator.validate(value)) {
+      return 'Email syntax is not valid.';
+    }
+    return null;
+  }
+
+  String? passwordValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password must not be empty.';
+    } else if (value.length < 6) {
+      return 'Password must be at least 6 digits.';
+    }
+    return null;
   }
 }
