@@ -1,6 +1,8 @@
 import 'package:clubs_booking/components/custom_button.dart';
 import 'package:clubs_booking/components/custom_text_field.dart';
 import 'package:clubs_booking/components/password_widget.dart';
+import 'package:clubs_booking/models/response_model.dart';
+import 'package:clubs_booking/service/api.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
@@ -118,7 +120,7 @@ class SignupScreen extends StatelessWidget {
                   const SizedBox(height: 15),
                   PasswordField(
                     hintText: 'Confirm Password',
-                    validator: passwordValidate,
+                    validator: confirmPasswordValidate,
                     onChanged: (data) {},
                     controller: confirmPasswordController,
                   ),
@@ -172,8 +174,34 @@ class SignupScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   CustomButton(
-                    onPressed: () {
-                      if (signUpKey.currentState!.validate()) {}
+                    onPressed: () async {
+                      if (signUpKey.currentState!.validate()) {
+                        API api = API();
+                        api.registerPushData(
+                            name: nameController.text,
+                            email: emailAddressController.text,
+                            password: passwordController.text,
+                            phoneNumber: phoneController.text);
+                        
+                        ResponseModel responseModel =
+                            await api.regirterResponse(
+                                name: nameController.text,
+                                email: emailAddressController.text,
+                                password: passwordController.text,
+                                phoneNumber: phoneController.text);
+
+                        if (responseModel.status == "success") {
+                          Navigator.pushNamed(context, 'Home');
+                        } else {
+                          showMessage(context, responseModel.message);
+                        }
+                        signUpKey.currentState!.reset();
+                        nameController.clear();
+                        emailAddressController.clear();
+                        passwordController.clear();
+                        confirmPasswordController.clear();
+                        phoneController.clear();
+                      }
                     },
                     labelText: 'Register',
                   ),
@@ -204,6 +232,15 @@ class SignupScreen extends StatelessWidget {
     return null;
   }
 
+  String? confirmPasswordValidate(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'please confirm your password.';
+    } else if (value != passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
   String? nameValidate(String? value) {
     if (value == null || value.isEmpty) {
       return 'Name must not be empty.';
@@ -218,6 +255,14 @@ class SignupScreen extends StatelessWidget {
       return 'Phone must be at least 11 digits.';
     }
     return null;
+  }
+
+  void showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 }
 /**/

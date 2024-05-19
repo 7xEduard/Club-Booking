@@ -1,6 +1,7 @@
 import 'package:clubs_booking/components/custom_button.dart';
 import 'package:clubs_booking/components/custom_text_field.dart';
 import 'package:clubs_booking/components/password_widget.dart';
+import 'package:clubs_booking/service/api.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:footer/footer.dart';
@@ -92,8 +93,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
-                    onTap: () {
-                    },
+                    onTap: () {},
                     child: const Text(
                       "Forgot Password?",
                       style: TextStyle(
@@ -103,8 +103,26 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   CustomButton(
-                    onPressed: () {
-                      if (logInKey.currentState!.validate()) {}
+                    onPressed: () async {
+                      if (logInKey.currentState!.validate()) {
+                        API api = API();
+                        api.loginPushData(
+                          email: emailAddressController.text,
+                          password: passwordController.text,
+                        );
+
+                        if (await api.loginResponse(
+                          email: emailAddressController.text,
+                          password: passwordController.text,
+                        )) {
+                          Navigator.pushNamed(context, 'Home');
+                        } else {
+                          showMessage(context, "Invalid Email Or Password");
+                        }
+                        logInKey.currentState!.reset();
+                        emailAddressController.clear();
+                        passwordController.clear();
+                      }
                     },
                     labelText: 'Login',
                   ),
@@ -181,5 +199,13 @@ class LoginScreen extends StatelessWidget {
       return 'Password must be at least 6 digits.';
     }
     return null;
+  }
+
+  void showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 }
